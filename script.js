@@ -183,7 +183,8 @@ processBtn.addEventListener('click', async () => {
         const durationStr = (parseInt(durationInput.value) / 1000).toFixed(2);
         
         // silenceremove filter require start_periods for stop_periods to work correctly on the whole file
-        const filter = `silenceremove=start_periods=1:start_duration=${durationStr}:start_threshold=${threshold}dB:stop_periods=-1:stop_duration=${durationStr}:stop_threshold=${threshold}dB`;
+        // start_duration MUST be 0 or very small, otherwise it requires X seconds of CONTINUOUS non-silence to even begin!
+        const filter = `silenceremove=start_periods=1:start_duration=0:start_threshold=${threshold}dB:stop_periods=-1:stop_duration=${durationStr}:stop_threshold=${threshold}dB`;
 
         progressText.innerText = 'Detectando y eliminando silencios...';
         
