@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recortador de Audio - Elimina Silencios</title>
+    <meta name="description" content="Elimina silencios de tus archivos de audio MP3 automáticamente desde el navegador.">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Estilos -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Recortador de Audio</h1>
+            <p>Sube tu archivo MP3 y elimina automáticamente los silencios. Todo el procesamiento se realiza en tu navegador de forma segura.</p>
+        </header>
+
+        <main>
+            <!-- Zona de Drop -->
+            <div id="drop-zone" class="drop-zone">
+                <div class="drop-content">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <p>Arrastra y suelta tu archivo MP3 aquí</p>
+                    <span class="or">o</span>
+                    <label for="file-input" class="btn-primary">Seleccionar Archivo</label>
+                    <input type="file" id="file-input" accept="audio/mp3,audio/mpeg" hidden>
+                </div>
+            </div>
+
+            <!-- Panel de Configuración -->
+            <div id="settings-panel" class="panel hidden">
+                <h2>Configuración de Detección</h2>
+                <div class="settings-grid">
+                    <div class="form-group">
+                        <label for="threshold">Umbral de silencio (dB)</label>
+                        <input type="range" id="threshold" min="-60" max="-10" value="-30" step="1">
+                        <span id="threshold-val" class="value-display">-30 dB</span>
+                        <small>Volumen por debajo del cual se considera silencio.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="duration">Duración mínima (ms)</label>
+                        <input type="number" id="duration" value="1000" min="100" max="5000" step="100">
+                        <small>Tiempo mínimo de silencio continuo para cortarlo.</small>
+                    </div>
+                </div>
+                <button id="process-btn" class="btn-success">Procesar Audio</button>
+            </div>
+
+            <!-- Estado de Procesamiento -->
+            <div id="processing-panel" class="panel hidden">
+                <h2>Procesando...</h2>
+                <div class="progress-bar-container">
+                    <div id="progress-bar" class="progress-bar"></div>
+                </div>
+                <p id="progress-text">Inicializando motor de audio...</p>
+            </div>
+
+            <!-- Visualización de Audios -->
+            <div id="audio-panel" class="panel hidden">
+                <div class="audio-track">
+                    <h3>Audio Original <span id="original-size" class="badge"></span></h3>
+                    <div id="waveform-original" class="waveform"></div>
+                    <div class="controls">
+                        <button id="play-original" class="btn-icon">▶️ Reproducir</button>
+                    </div>
+                </div>
+
+                <div class="audio-track result-track hidden" id="result-container">
+                    <h3>Audio Procesado <span id="processed-size" class="badge badge-success"></span></h3>
+                    <div id="waveform-processed" class="waveform"></div>
+                    <div class="controls">
+                        <button id="play-processed" class="btn-icon">▶️ Reproducir</button>
+                        <button id="download-btn" class="btn-primary">⬇️ Descargar MP3</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts externos -->
+    <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
+    <script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
+    
+    <!-- Lógica de la app -->
+    <script src="script.js"></script>
+</body>
+</html>
