@@ -49,7 +49,8 @@ async function initFFmpeg() {
 
         await ffmpeg.load({
             coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-            wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm')
+            wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+            classWorkerURL: await toBlobURL(`${baseURL}/814.ffmpeg.js`, 'text/javascript')
         });
         return true;
     } catch (err) {
