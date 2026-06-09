@@ -40,10 +40,16 @@ async function initFFmpeg() {
             progressBar.style.width = `${percent}%`;
             progressText.innerText = `Procesando: ${percent}% completado...`;
         });
+        const { toBlobURL } = window.FFmpegUtil;
+        const baseURL = '.';
         
+        ffmpeg.on('log', ({ message }) => {
+            console.log("FFmpeg log:", message);
+        });
+
         await ffmpeg.load({
-            coreURL: "ffmpeg-core.js",
-            wasmURL: "ffmpeg-core.wasm"
+            coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+            wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm')
         });
         return true;
     } catch (err) {
