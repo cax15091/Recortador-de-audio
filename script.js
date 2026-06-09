@@ -30,32 +30,25 @@ let processedBlobUrl = null;
 
 // Initialize FFmpeg
 async function initFFmpeg() {
-    if (ffmpeg) return true;
+    if (ffmpeg && ffmpeg.isLoaded()) return true;
     try {
-        const { FFmpeg } = window.FFmpegWASM;
-        ffmpeg = new FFmpeg();
+        const { createFFmpeg } = FFmpeg;
+        ffmpeg = createFFmpeg({
+            log: true,
+            corePath: 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
+        });
         
-        ffmpeg.on('progress', ({ progress, time }) => {
-            const percent = Math.round(progress * 100);
+        ffmpeg.setProgress(({ ratio }) => {
+            const percent = Math.round(ratio * 100);
             progressBar.style.width = `${percent}%`;
             progressText.innerText = `Procesando: ${percent}% completado...`;
         });
-        const { toBlobURL } = window.FFmpegUtil;
-        const baseURL = '.';
         
-        ffmpeg.on('log', ({ message }) => {
-            console.log("FFmpeg log:", message);
-        });
-
-        await ffmpeg.load({
-            coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-            wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-            classWorkerURL: await toBlobURL(`${baseURL}/814.ffmpeg.js`, 'text/javascript')
-        });
+        await ffmpeg.load();
         return true;
     } catch (err) {
         console.error("Error cargando FFmpeg:", err);
-        progressText.innerText = "Error cargando el motor de procesamiento. Es posible que tu navegador no lo soporte (falta SharedArrayBuffer).";
+        progressText.innerText = `Error crítico al cargar FFmpeg: ${err.message}`;
         return false;
     }
 }
@@ -114,7 +107,7 @@ function initWaveSurfers() {
 // Handle File Selection
 function handleFile(file) {
     if (!file || !file.type.startsWith('audio/')) {
-        alert('Por favor selecciona un archivo de audio válido (MP3).');
+        alert('Por favor selecciona un archivo de audio válido (MP3/WAV).');
         return;
     }
 
@@ -178,12 +171,13 @@ processBtn.addEventListener('click', async () => {
 
     try {
         progressText.innerText = 'Cargando archivo de audio...';
-        const { fetchFile } = window.FFmpegUtil;
+        const { fetchFile } = FFmpeg;
+        
         const ext = currentFile.name.split('.').pop().toLowerCase() === 'wav' ? 'wav' : 'mp3';
         const inputName = `input.${ext}`;
         const outputName = `output.${ext}`;
         
-        await ffmpeg.writeFile(inputName, await fetchFile(currentFile));
+        ffmpeg.FS('writeFile', inputName, await fetchFile(currentFile));
 
         const threshold = thresholdSlider.value;
         const durationStr = (parseInt(durationInput.value) / 1000).toFixed(2);
@@ -193,10 +187,11 @@ processBtn.addEventListener('click', async () => {
 
         progressText.innerText = 'Detectando y eliminando silencios...';
         
-        await ffmpeg.exec(['-i', inputName, '-af', filter, outputName]);
+        await ffmpeg.run('-i', inputName, '-af', filter, outputName);
 
         progressText.innerText = 'Generando archivo final...';
-        const data = await ffmpeg.readFile(outputName);
+        const data = ffmpeg.FS('readFile', outputName);
+        
         const mimeType = ext === 'wav' ? 'audio/wav' : 'audio/mp3';
         const blob = new Blob([data.buffer], { type: mimeType });
         
@@ -220,11 +215,11 @@ processBtn.addEventListener('click', async () => {
 
     } catch (err) {
         console.error(err);
-        progressText.innerText = 'Error durante el procesamiento.';
+        progressText.innerText = `Error durante el procesamiento: ${err.message}`;
         setTimeout(() => {
             processingPanel.classList.add('hidden');
             settingsPanel.classList.remove('hidden');
-        }, 3000);
+        }, 5000);
     }
 });
 

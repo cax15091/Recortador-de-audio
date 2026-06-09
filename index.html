@@ -16,7 +16,7 @@
     <div class="container">
         <header>
             <h1>Recortador de Audio</h1>
-            <p>Sube tu archivo MP3 y elimina automáticamente los silencios. Todo el procesamiento se realiza en tu navegador de forma segura.</p>
+            <p>Sube tu archivo de audio y elimina automáticamente los silencios. Todo el procesamiento se realiza en tu navegador de forma segura.</p>
         </header>
 
         <main>
@@ -28,7 +28,7 @@
                         <polyline points="17 8 12 3 7 8"></polyline>
                         <line x1="12" y1="3" x2="12" y2="15"></line>
                     </svg>
-                    <p>Arrastra y suelta tu archivo MP3 aquí</p>
+                    <p>Arrastra y suelta tu archivo MP3/WAV aquí</p>
                     <span class="or">o</span>
                     <label for="file-input" class="btn-primary">Seleccionar Archivo</label>
                     <input type="file" id="file-input" accept="audio/mp3,audio/mpeg,audio/wav" hidden>
@@ -78,7 +78,7 @@
                     <div id="waveform-processed" class="waveform"></div>
                     <div class="controls">
                         <button id="play-processed" class="btn-icon">▶️ Reproducir</button>
-                        <button id="download-btn" class="btn-primary">⬇️ Descargar MP3</button>
+                        <button id="download-btn" class="btn-primary">⬇️ Descargar Archivo</button>
                     </div>
                 </div>
             </div>
@@ -86,9 +86,9 @@
     </div>
 
     <!-- Scripts externos -->
-    <script src="wavesurfer.min.js"></script>
-    <script src="ffmpeg.js"></script>
-    <script src="ffmpeg-util.js"></script>
+    <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
+    <!-- Usamos FFmpeg.wasm v0.11.x que NO requiere SharedArrayBuffer -->
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
     
     <!-- Lógica de la app -->
     <script src="script.js"></script>
