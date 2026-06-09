@@ -1,4 +1,5 @@
 {
+  "name": "recortador-de-audio",
   "headers": [
     {
       "source": "/(.*)",
