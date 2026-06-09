@@ -35,7 +35,7 @@ async function initFFmpeg() {
         const { createFFmpeg } = FFmpeg;
         ffmpeg = createFFmpeg({
             log: true,
-            corePath: 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
+            corePath: 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
         });
         
         ffmpeg.setProgress(({ ratio }) => {
