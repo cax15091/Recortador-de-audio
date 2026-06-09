@@ -182,12 +182,12 @@ processBtn.addEventListener('click', async () => {
         const threshold = thresholdSlider.value;
         const durationStr = (parseInt(durationInput.value) / 1000).toFixed(2);
         
-        // silenceremove filter:
-        const filter = `silenceremove=stop_periods=-1:stop_duration=${durationStr}:stop_threshold=${threshold}dB`;
+        // silenceremove filter require start_periods for stop_periods to work correctly on the whole file
+        const filter = `silenceremove=start_periods=1:start_duration=${durationStr}:start_threshold=${threshold}dB:stop_periods=-1:stop_duration=${durationStr}:stop_threshold=${threshold}dB`;
 
         progressText.innerText = 'Detectando y eliminando silencios...';
         
-        await ffmpeg.run('-i', inputName, '-af', filter, outputName);
+        await ffmpeg.run('-i', inputName, '-af', filter, '-y', outputName);
 
         progressText.innerText = 'Generando archivo final...';
         const data = ffmpeg.FS('readFile', outputName);
