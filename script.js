@@ -172,24 +172,26 @@ processBtn.addEventListener('click', async () => {
     try {
         progressText.innerText = 'Cargando archivo de audio...';
         const { fetchFile } = window.FFmpegUtil;
-        await ffmpeg.writeFile('input.mp3', await fetchFile(currentFile));
+        const ext = currentFile.name.split('.').pop().toLowerCase() === 'wav' ? 'wav' : 'mp3';
+        const inputName = `input.${ext}`;
+        const outputName = `output.${ext}`;
+        
+        await ffmpeg.writeFile(inputName, await fetchFile(currentFile));
 
         const threshold = thresholdSlider.value;
         const durationStr = (parseInt(durationInput.value) / 1000).toFixed(2);
         
         // silenceremove filter:
-        // stop_periods=-1 (remove all silences)
-        // stop_duration (minimum silence duration to remove)
-        // stop_threshold (threshold level to consider as silence)
         const filter = `silenceremove=stop_periods=-1:stop_duration=${durationStr}:stop_threshold=${threshold}dB`;
 
         progressText.innerText = 'Detectando y eliminando silencios...';
         
-        await ffmpeg.exec(['-i', 'input.mp3', '-af', filter, 'output.mp3']);
+        await ffmpeg.exec(['-i', inputName, '-af', filter, outputName]);
 
         progressText.innerText = 'Generando archivo final...';
-        const data = await ffmpeg.readFile('output.mp3');
-        const blob = new Blob([data.buffer], { type: 'audio/mp3' });
+        const data = await ffmpeg.readFile(outputName);
+        const mimeType = ext === 'wav' ? 'audio/wav' : 'audio/mp3';
+        const blob = new Blob([data.buffer], { type: mimeType });
         
         if (processedBlobUrl) URL.revokeObjectURL(processedBlobUrl);
         processedBlobUrl = URL.createObjectURL(blob);
